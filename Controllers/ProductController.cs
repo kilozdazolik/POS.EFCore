@@ -4,10 +4,10 @@ namespace PointOfSale.EntityFramework;
 
 public class ProductController
 {
-    public static void AddProduct(string name)
+    public static void AddProduct(Product product)
     {
         using var db = new ProductsContext();
-        db.Add(new Product{ Name = name });
+        db.Add(product);
         db.SaveChanges();
     }
 
@@ -18,15 +18,17 @@ public class ProductController
         db.SaveChanges();
     }
 
-    public static void UpdateProduct()
-    {
-        throw new NotImplementedException();
+    public static void UpdateProduct(Product product)
+    { 
+        using var db = new ProductsContext();
+        db.Update(product);
+        db.SaveChanges();
     }
 
     public static Product GetProductById(int id)
     {
         using var db = new ProductsContext();
-        var product = db.Products.SingleOrDefault(x => x.Id == id);
+        var product = db.Products.SingleOrDefault(x => x.ProductId == id);
         return product;
     }
 
