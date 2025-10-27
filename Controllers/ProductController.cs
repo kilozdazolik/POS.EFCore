@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using Microsoft.EntityFrameworkCore;
+using Spectre.Console;
 
 namespace PointOfSale.EntityFramework;
 
@@ -28,14 +29,14 @@ public class ProductController
     public static Product GetProductById(int id)
     {
         using var db = new ProductsContext();
-        var product = db.Products.SingleOrDefault(x => x.ProductId == id);
+        var product = db.Products.Include(x => x.Category).SingleOrDefault(x => x.ProductId == id);
         return product;
     }
 
     public static List<Product> GetProducts()
     {
         using var db = new ProductsContext();
-        var products = db.Products.ToList();
+        var products = db.Products.Include(x => x.Category).ToList();
         return products;
     }
 }
