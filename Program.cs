@@ -1,4 +1,7 @@
 ﻿using PointOfSale.EntityFramework;
-using Spectre.Console;
+
+var context = new ProductsContext();
+context.Database.EnsureDeleted();
+context.Database.EnsureCreated();
 
 UserInterface.MainMenu();

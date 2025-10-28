@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using PointOfSale.EntityFramework.DTOs;
+using Spectre.Console;
 
 namespace PointOfSale.EntityFramework;
 
@@ -13,7 +14,7 @@ static class UserInterface
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<Enums.MainMenuOptions>()
                     .Title("What would you like to do?").AddChoices(Enums.MainMenuOptions.ManageCategories,
-                        Enums.MainMenuOptions.ManageProducts, Enums.MainMenuOptions.Quit));
+                        Enums.MainMenuOptions.ManageProducts, Enums.MainMenuOptions.ManageOrders, Enums.MainMenuOptions.Quit));
             switch (option)
             {
                 case Enums.MainMenuOptions.ManageCategories:
@@ -22,9 +23,40 @@ static class UserInterface
                 case Enums.MainMenuOptions.ManageProducts:
                     ProductsMenu();
                     break;
+                case Enums.MainMenuOptions.ManageOrders:
+                    OrdersMenu();
+                    break;
                 case Enums.MainMenuOptions.Quit:
                     AnsiConsole.WriteLine("Goodbye!");
                     isAppRunning = false;
+                    break;
+            }
+        }
+    }
+
+    private static void OrdersMenu()
+    {
+        var isOrderMenuRunning = true;
+        while (isOrderMenuRunning)
+        {
+            AnsiConsole.Clear();
+            var option = AnsiConsole.Prompt(
+                new SelectionPrompt<Enums.OrderMenu>().Title("Order Menu").AddChoices(Enums.OrderMenu.AddOrder, Enums.OrderMenu.GetOrders,Enums.OrderMenu.GetOrder,Enums.OrderMenu.Goback)
+            );
+
+            switch (option)
+            {
+                case Enums.OrderMenu.AddOrder:
+                    OrderService.InsertOrder();
+                    break;
+                case Enums.OrderMenu.GetOrders:
+                    OrderService.GetOrders();
+                    break;
+                case Enums.OrderMenu.GetOrder:
+                    OrderService.GetOrder();
+                    break;
+                case Enums.OrderMenu.Goback:
+                    isOrderMenuRunning = false;
                     break;
             }
         }
@@ -174,5 +206,69 @@ static class UserInterface
         AnsiConsole.WriteLine("Press any key to continue...");
         Console.ReadLine();
         AnsiConsole.Clear();
+    }
+
+    public static void ShowOrderTable(List<Order> orders)
+    {
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Date");
+        table.AddColumn("Count");
+        table.AddColumn("Total Price");
+
+        foreach (var order in orders)
+        {
+            table.AddRow(
+                order.OrderId.ToString(),
+                order.CreatedDate.ToString(),
+                order.OrderProducts.Sum(x => x.Quantity).ToString(),
+                order.TotalPrice.ToString());
+        }
+
+        AnsiConsole.Write(table);
+
+        AnsiConsole.WriteLine("Press any key to continue...");
+        Console.ReadLine();
+        AnsiConsole.Clear();
+    }
+
+    public static void ShowProductForOrderTable(List<ProductForOrderViewDTO> products)
+    {
+        var table = new  Table();
+        table.AddColumn("Id");
+        table.AddColumn("Name");
+        table.AddColumn("Category");
+        table.AddColumn("Price");
+        table.AddColumn("Quantity");
+        table.AddColumn("Total Price");
+
+        foreach (var product in products)
+        {
+            table.AddRow(
+                product.Id.ToString(),
+                product.Name,
+                product.CategoryName,
+                product.Price.ToString(),
+                product.Quantity.ToString(),
+                product.TotalPrice.ToString()
+            );
+        }
+        
+        AnsiConsole.Write(table);
+
+        AnsiConsole.WriteLine("Press any key to continue...");
+        Console.ReadLine();
+        AnsiConsole.Clear();
+    }
+
+    public static void ShowOrder(Order order)
+    {
+        var panel = new Panel($@"Id: {order.OrderId}
+                                    Date: {order.CreatedDate}
+                                    Product Count: {order.OrderProducts.Count}");
+        panel.Header = new PanelHeader($"Order #{order.OrderId}");
+        panel.Padding = new Padding(2, 2, 2, 2);
+
+        AnsiConsole.Write(panel);
     }
 }
