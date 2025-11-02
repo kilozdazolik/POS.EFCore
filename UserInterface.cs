@@ -10,11 +10,11 @@ static class UserInterface
         var isAppRunning = true;
         while (isAppRunning)
         {
-            AnsiConsole.Clear();
+            //AnsiConsole.Clear();
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<Enums.MainMenuOptions>()
                     .Title("What would you like to do?").AddChoices(Enums.MainMenuOptions.ManageCategories,
-                        Enums.MainMenuOptions.ManageProducts, Enums.MainMenuOptions.ManageOrders, Enums.MainMenuOptions.Quit));
+                        Enums.MainMenuOptions.ManageProducts, Enums.MainMenuOptions.ManageOrders, Enums.MainMenuOptions.GenerateReport,Enums.MainMenuOptions.Quit));
             switch (option)
             {
                 case Enums.MainMenuOptions.ManageCategories:
@@ -25,6 +25,9 @@ static class UserInterface
                     break;
                 case Enums.MainMenuOptions.ManageOrders:
                     OrdersMenu();
+                    break;
+                case Enums.MainMenuOptions.GenerateReport:
+                    ReportService.CreateMonthlyReport();
                     break;
                 case Enums.MainMenuOptions.Quit:
                     AnsiConsole.WriteLine("Goodbye!");
@@ -39,7 +42,7 @@ static class UserInterface
         var isOrderMenuRunning = true;
         while (isOrderMenuRunning)
         {
-            AnsiConsole.Clear();
+            //AnsiConsole.Clear();
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<Enums.OrderMenu>().Title("Order Menu").AddChoices(Enums.OrderMenu.AddOrder, Enums.OrderMenu.GetOrders,Enums.OrderMenu.GetOrder,Enums.OrderMenu.Goback)
             );
@@ -67,7 +70,7 @@ static class UserInterface
         var isCategoriesMenuRunning = true;
         while (isCategoriesMenuRunning)
         {
-            AnsiConsole.Clear();
+            //AnsiConsole.Clear();
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<Enums.CategoryMenu>().Title("Categories Menu").AddChoices(
                     Enums.CategoryMenu.AddCategory, Enums.CategoryMenu.DeleteCategory,
@@ -104,7 +107,7 @@ static class UserInterface
         var isProductsMenuRunning = true;
         while (isProductsMenuRunning)
         {
-            AnsiConsole.Clear();
+            //AnsiConsole.Clear();
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<Enums.ProductMenu>().Title("Products Menu").AddChoices(Enums.ProductMenu.AddProduct,
                     Enums.ProductMenu.DeleteProduct, Enums.ProductMenu.UpdateProduct, Enums.ProductMenu.ViewAllProducts,
@@ -270,5 +273,24 @@ static class UserInterface
         panel.Padding = new Padding(2, 2, 2, 2);
 
         AnsiConsole.Write(panel);
+    }
+
+    public static void ShowReportByMonth(List<MonthlyReportDTO> report)
+    {
+        var table = new  Table();
+        table.AddColumn("Month");
+        table.AddColumn("Total Quantity");
+        table.AddColumn("Total Sales");
+
+        foreach (var item in report)
+        {
+            table.AddRow(
+                item.Month,
+                item.TotalQuantity.ToString(),
+                item.TotalPrice.ToString()
+            );
+        }
+        
+        AnsiConsole.Write(table);
     }
 }
